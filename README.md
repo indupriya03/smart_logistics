@@ -82,7 +82,7 @@ pip install -r requirements.txt
 - Technical Skills Showcase: Python, SQL, Streamlit, ETL, Database design
 
 👤 Author
-- Indupriya Chidambararaj
+## Indupriya Chidambararaj ##
 
 
    
