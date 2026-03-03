@@ -17,13 +17,21 @@ This project demonstrates a full pipeline from raw data to actionable business i
 ```
 smart_logistics/
 │
-├── Logistics.ipynb           # Data profiling, cleaning, DB design, table creation
-├── fix_routes.ipynb          # ETL fixes for routes table
-├── db.py                     # MySQL database connection
-├── queries.py                # SQL queries for analytics
-├── components.py             # Reusable Streamlit components (KPI cards)
+├── notebooks/
+│   ├── Logistics.ipynb
+│   └── fix_routes.ipynb
 │
-├── data/                     # Source datasets
+├── streamlit/
+│   ├── db.py
+│   ├── queries.py
+│   ├── components.py
+│   ├── logistics_kpi.py
+│   ├── cost_analytics.py
+│   ├── courier_analytics.py
+│   ├── route_analytics.py
+│   └── warehouse_analytics.py
+│
+├── data/
 │   ├── costs.csv
 │   ├── courier_staff.csv
 │   ├── routes.csv
@@ -31,14 +39,7 @@ smart_logistics/
 │   ├── shipments.json
 │   └── warehouses.json
 │
-├── streamlit_pages/          # Interactive dashboard pages
-│   ├── logistics_kpi.py      # Homepage / KPI dashboard
-│   ├── cost_analytics.py
-│   ├── courier_analytics.py
-│   ├── route_analytics.py
-│   └── warehouse_analytics.py
-│
-└── requirements.txt          # Project dependencies
+└── requirements.txt
 ```
 pip install -r requirements.txt
 
