@@ -14,7 +14,7 @@ A comprehensive logistics analytics system for analyzing shipments, optimizing r
 This project demonstrates a full pipeline from raw data to actionable business insights.
 
 🏗️ Project Structure
-
+```
 smart_logistics/
 │
 ├── Logistics.ipynb           # Data profiling, cleaning, DB design, table creation
@@ -39,7 +39,7 @@ smart_logistics/
 │   └── warehouse_analytics.py
 │
 └── requirements.txt          # Project dependencies
-
+```
 pip install -r requirements.txt
 
 🖥️ Features
