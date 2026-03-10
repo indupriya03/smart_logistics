@@ -108,7 +108,8 @@ def app(run_query):
         x='warehouse_city',
         y='cancellation_rate_pct',
         title='Cancellation Rate by Warehouse',
-        labels={'cancellation_rate_pct':'Cancellation Rate (%)'},
+        labels={'cancellation_rate_pct':'Cancellation Rate (%)',
+                "warehouse_city" : "Warehouse City"},
         color='cancellation_rate_pct',
         color_continuous_scale='Reds'
     )
@@ -136,7 +137,9 @@ def app(run_query):
         y="contribution_to_total_delays_pct",
         color='risk_level',
         title="Warehouse Contribution to Total Network Delays (%)",
-        labels={"contribution_to_total_delays_pct": "Contribution %"},
+        labels={"contribution_to_total_delays_pct": "Contribution %",
+                "city" : "City",
+                "risk_level": "Risk Level"},
         color_discrete_map={
             "Critical":"red",
             "Monitor":"orange",

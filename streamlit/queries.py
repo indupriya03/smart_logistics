@@ -29,9 +29,9 @@ def get_top_couriers(limit=10):
     LIMIT {limit};
     """
     return run_query(query)
-# -------------------------------
-# Shipment Tracking Search QuERY
-# -------------------------------
+#===============================
+# Shipment Tracking Search Query
+#===============================
 shipment_search_query= """
 SELECT s.shipment_id,s.status,s.order_date,s.delivery_date,
     c.name as courier_name,r.origin,r.destination
@@ -412,6 +412,7 @@ courier_performance_query= """
 SELECT 
     c.courier_id,
     c.name AS courier_name,
+    c.rating AS rating,
     COUNT(s.shipment_id) AS total_shipments,
     SUM(CASE WHEN TIMESTAMPDIFF(HOUR, s.order_date, s.delivery_date) <= r.avg_time_hours THEN 1 ELSE 0 END) AS on_time_shipments,
     ROUND(100.0 * SUM(CASE WHEN TIMESTAMPDIFF(HOUR, s.order_date, s.delivery_date) <= r.avg_time_hours THEN 1 ELSE 0 END) / COUNT(s.shipment_id), 2) AS on_time_pct
@@ -419,7 +420,7 @@ FROM shipments s
 JOIN courier_staff c ON s.courier_id = c.courier_id
 JOIN routes r ON s.route_key = r.route_key
 WHERE s.status = 'Delivered'
-GROUP BY c.courier_id, c.name
+GROUP BY c.courier_id, c.name, c.rating
 ORDER BY total_shipments DESC;
 """
 # ==============================
@@ -438,7 +439,24 @@ WHERE s.status='Delivered'
 GROUP BY c.vehicle_type
 ORDER BY shipments_handled DESC;
 """
-
+cancel_by_courier_query = """
+SELECT 
+    c.name AS courier_name,
+    c.vehicle_type,
+    c.rating,
+    COUNT(s.shipment_id) AS total_shipments,
+    SUM(CASE WHEN s.status='Cancelled' THEN 1 ELSE 0 END) AS cancelled_shipments,
+    ROUND(
+        100.0 * SUM(CASE WHEN s.status='Cancelled' THEN 1 ELSE 0 END) 
+        / COUNT(s.shipment_id), 2
+    ) AS cancellation_rate_pct
+FROM shipments s
+JOIN courier_staff c
+    ON s.courier_id = c.courier_id
+GROUP BY c.courier_id, c.name, c.vehicle_type, c.rating
+HAVING COUNT(s.shipment_id) >= 10
+ORDER BY cancellation_rate_pct DESC;
+"""
 
 
 

@@ -173,10 +173,10 @@ if page == "Homepage":
         else:
             st.write("🚛 No data available")  
     # ===============================
-    # RIGHT COLUMN: Business Leaders
+    # RIGHT COLUMN: Market performance
     # ===============================
     with right:
-        st.subheader("📍 Business Leaders")
+        st.subheader("📍 Market Performance")
         # --- Top Origin City ---
         st.write("Top Origin City")
               
@@ -286,7 +286,7 @@ if page == "Homepage":
                 "On_Time_Delivery": "{:.2f}%",
                 "Avg_cost_per_shipment": "${:.2f}",
                 "Rating": "{:.1f}"
-            },),
+            }),
             use_container_width=True
         )
 elif page == "Warehouse Analytics":
