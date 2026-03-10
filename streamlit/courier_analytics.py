@@ -1,4 +1,5 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 from db import run_query
@@ -10,66 +11,77 @@ def app(run_query):
     st.header("🛵🚚 Courier Performance")
     courier_performance_df=run_query(courier_performance_query)
     
-    # =============================
-    # SHIPMENTS VS ON_TIME_DELIVERY
-    # =============================
-    # Create combined chart: Bar for shipments, line for on-time %
-    fig = go.Figure()
+    # # =============================
+    # # SHIPMENTS VS ON_TIME_DELIVERY
+    # # =============================
 
-    # Bar: Shipments handled
-    fig.add_trace(go.Bar(
-        x=courier_performance_df['courier_name'],
-        y=courier_performance_df['total_shipments'],
-        name='Shipments Handled',
-        marker_color='skyblue',
-        text=courier_performance_df['total_shipments'],
-        textposition='auto'
-    ))
-
-    # Line: On-time delivery %
-    fig.add_trace(go.Scatter(
-        x=courier_performance_df['courier_name'],
-        y=courier_performance_df['on_time_pct'],
-        name='On-Time Delivery %',
-        mode='lines+markers+text',
-        text=courier_performance_df['on_time_pct'].apply(lambda x: f'{x:.1f}%'),
-        textposition='top center',
-        marker=dict(color='green', size=10),
-        yaxis='y2'
-    ))
-
-    # Layout: secondary y-axis for on-time %
-    fig.update_layout(
-        title="📦 Courier Performance: Shipments vs On-Time Delivery",
-        xaxis_title="Courier",
-        yaxis=dict(title="Total Shipments"),
-        yaxis2=dict(title="On-Time Delivery %", overlaying='y', side='right', range=[0,100]),
-        legend=dict(x=0.75, y=1.1),
-        template='plotly_white',
-        barmode='group',
-        hovermode='x'
+    fig = px.scatter(
+        courier_performance_df,
+        x="total_shipments",
+        y="on_time_pct",
+        hover_name="courier_name",
+        hover_data={"rating": True},
+        labels={
+            "total_shipments": "Total Shipments",
+            "on_time_pct": "On-Time Delivery (%)",
+            "rating" : "Rating"
+        },
+        title="Courier Performance Analysis"
     )
-    fig.update_traces(text=None)
-    st.plotly_chart(fig, use_container_width=True)
 
-    st.markdown("---")
+    fig.update_traces(textposition="top center")
+
+    st.plotly_chart(fig, use_container_width=True)
+    # ==============================
+    # COURIER CANCELLATION ANALYSIS
+    # ==============================
+    st.subheader("Courier Cancellation Analysis")
+    st.markdown("### Cancellation Rate by Courier")
+    cancel_courier_df = run_query(cancel_by_courier_query)
+    fig = px.bar(
+        cancel_courier_df,
+        x="courier_name",
+        y="cancellation_rate_pct",
+        color="vehicle_type",  # optional
+        hover_data=["rating", "total_shipments", "cancelled_shipments"],
+        labels={"cancellation_rate_pct": "Cancellation Rate (%)",
+                "courier_name": "Courier Name",
+                "vehicle_type": "Vehicle Type"
+        },
+        title="Courier Cancellation Rate"
+    )
+
+    fig.update_layout(xaxis_tickangle=-45, yaxis_range=[0, cancel_courier_df['cancellation_rate_pct'].max() + 5])
+
+    st.plotly_chart(fig, use_container_width=True)
     
     # ==============================
     # SHIPMENT COUNT VS VEHICLE TYPE
     # ==============================
-    st.subheader("🚛 Shipment Count vs Vehicle Type")
+    st.subheader("🚛 Vehicle Type Distribution")
     vehicle_df=run_query(vehicle_query)
-    fig = px.bar(
-        vehicle_df,
-        x='vehicle_type',
-        y='shipments_handled',
-        color='on_time_pct',            # optional: color by performance
-        hover_data=['avg_delivery_hours', 'on_time_pct'],
-        title='Shipment Count vs Vehicle Type',
-        labels={'shipments_handled':'Shipments Handled','vehicle_type':'Vehicle Type'}
-    )
+    col1, col2 = st.columns(2)
+    with col1:
+        fig= px.bar(
+            vehicle_df,
+            x='vehicle_type',
+            y='shipments_handled',
+            color='on_time_pct',            # optional: color by performance
+            hover_data=['avg_delivery_hours', 'on_time_pct'],
+            title='Shipment Count vs Vehicle Type',
+            labels={'shipments_handled':'Shipments Handled','vehicle_type':'Vehicle Type'}
+        )
 
-    st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=True)
+    with col2:
+        fig_pie = px.pie(
+            vehicle_df,
+            names='vehicle_type',
+            values='shipments_handled',
+            title='Vehicle Type Share',
+            color='vehicle_type'
+        )
+        st.plotly_chart(fig_pie, use_container_width=True)
     st.markdown("---")
     st.subheader("📋 Shipment Count vs Vehicle Type")
     st.dataframe(
