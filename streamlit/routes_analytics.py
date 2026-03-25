@@ -49,30 +49,73 @@ def app(run_query):
 
     route_df['risk_level'] = route_df['route_delay_pct'].apply(classify_risk)
 
-    # ====================
-    # Transit Delay Chart
-    # ====================
-    fig = px.bar(
-        route_df.sort_values('route_delay_pct', ascending=False),
-        x='route_name',
-        y='route_delay_pct',
-        color='risk_level',
-        title="Route Delay % (Pickup → Delivery)",
-        labels={"route_delay_pct": "Delay %", "route_name": "Route"},
-        color_discrete_map={
-            "Critical": "red",
-            "Monitor": "orange",
-            "Healthy": "green"
-        }
-    )
 
-    fig.update_layout(
-        xaxis_tickangle=-45,
-        yaxis=dict(range=[0, 100]),
-        hovermode='x unified'
-    )
+    # ====================
+    # Top 5 routes per risk level
+    # ====================
+    top_n = 5
+    critical_routes = route_df[route_df['risk_level'] == 'Critical'].sort_values('route_delay_pct', ascending=False).head(top_n)
+    monitor_routes = route_df[route_df['risk_level'] == 'Monitor'].sort_values('route_delay_pct', ascending=False).head(top_n)
+    healthy_routes = route_df[route_df['risk_level'] == 'Healthy'].sort_values('route_delay_pct', ascending=False).head(top_n)
 
-    st.plotly_chart(fig, use_container_width=True)
+    # ====================
+    # Create 3 columns
+    # ====================
+    col1, col2, col3 = st.columns(3)
+
+        # Critical Routes Chart
+    with col1:
+        st.markdown("### 🔴 Critical Routes")
+        if not critical_routes.empty:
+            fig1 = px.bar(
+                    critical_routes,
+            x='route_name',
+            y='route_delay_pct',
+            color='route_delay_pct',
+            color_continuous_scale='Reds',
+                    title="Top Critical Routes",
+                    labels={"route_delay_pct": "Delay %", "route_name": "Route"}
+                )
+            fig1.update_layout(xaxis_tickangle=-45, yaxis=dict(range=[0, 100]), showlegend=False)
+            st.plotly_chart(fig1, use_container_width=True)
+        else:
+            st.write("No critical routes found.")
+
+    # Monitor Routes Chart
+    with col2:
+        st.markdown("### 🟠 Monitor Routes")
+        if not monitor_routes.empty:
+            fig2 = px.bar(
+                monitor_routes,
+                x='route_name',
+                y='route_delay_pct',
+                color='route_delay_pct',
+                color_continuous_scale='Oranges',
+                title="Top Monitor Routes",
+                labels={"route_delay_pct": "Delay %", "route_name": "Route"}
+            )
+            fig2.update_layout(xaxis_tickangle=-45, yaxis=dict(range=[0, 100]), showlegend=False)
+            st.plotly_chart(fig2, use_container_width=True)
+        else:
+            st.write("No monitor routes found.")
+
+    # Healthy Routes Chart
+    with col3:
+        st.markdown("### 🟢 Healthy Routes")
+        if not healthy_routes.empty:
+            fig3 = px.bar(
+                healthy_routes,
+                x='route_name',
+                y='route_delay_pct',
+                color='route_delay_pct',
+                color_continuous_scale='Greens',
+                title="Top Healthy Routes",
+                labels={"route_delay_pct": "Delay %", "route_name": "Route"}
+            )
+            fig3.update_layout(xaxis_tickangle=-45, yaxis=dict(range=[0, 100]), showlegend=False)
+            st.plotly_chart(fig3, use_container_width=True)
+        else:
+            st.write("No healthy routes found.")
 
     st.markdown("---")
 
