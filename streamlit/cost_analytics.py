@@ -106,7 +106,6 @@ def app(run_query):
     top_cost_routes = route_metrics.sort_values('total_cost', ascending=False).head(top_n)
     
     fig_route = px.bar(
-        #route_metrics.sort_values('total_cost', ascending=False),
         top_cost_routes,
         x='route_name',
         y='total_cost',
