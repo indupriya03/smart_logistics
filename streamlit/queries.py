@@ -113,7 +113,7 @@ LEFT JOIN shipment_tracking op ON op.shipment_key = s.shipment_key
                                 AND op.status = 'Order Placed'
 LEFT JOIN shipment_tracking pu ON pu.shipment_key = s.shipment_key
                                 AND pu.status = 'Picked Up'
-WHERE s.status = 'Delivered'
+WHERE s.status != 'Cancelled'
 GROUP BY 
     w.warehouse_key,
     w.city,
@@ -301,6 +301,7 @@ SELECT
     ROUND(100 * COUNT(s.shipment_id) / w.capacity, 2) AS capacity_utilization_pct
 FROM warehouses w
 LEFT JOIN shipments s ON s.origin_warehouse_key = w.warehouse_key
+WHERE s.status != 'Cancelled'
 GROUP BY w.city, w.capacity
 ORDER BY capacity_utilization_pct DESC;
 """
